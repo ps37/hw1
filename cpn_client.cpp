@@ -153,7 +153,13 @@ int main(int argc, char *argv[])
         }
          printf("client: sent CPN_ACK of %d bytes to %s\n", numbytes, argv[2]);
 
+         cout<<data<<endl;  //is the client getting the new portnumber??
+
          //probably add some delay.
+         for (double i = 0; i < 20000; i = i + 0.5)
+          {
+
+          } 
 
          //now create new socket for revceiving on the the new port
          if ((rv = getaddrinfo(argv[2], data.c_str(), &hints, &servinfo)) != 0) 
