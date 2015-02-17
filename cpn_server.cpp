@@ -26,7 +26,6 @@ string received_request;
 string message;
     char operation;
     vector<double> operands;
-    double result;
     int port_number = 5000;
     int numbytes; int numbytes1, numbytes2, numbytes3;
     char buf1[MAXBUFLEN];
@@ -159,7 +158,7 @@ freeaddrinfo(servinfo);
      s, sizeof s));
      //print the number of bytes received and print the bytes.
      printf("server: packet is %d bytes long\n", numbytes);
-     //buf[numbytes] = '\0';
+     buf[numbytes] = '\0';
      printf("server: packet contains '%s' \n", buf);
      
      //reading the message from the client.
@@ -197,6 +196,7 @@ void check_the_message(string& message, int new_fd)
                 } 
                 else
                 {
+                   operands.clear();
                    operands = get_operands(received_request);
                    if(!check_operands(operands))
                         {
@@ -205,11 +205,11 @@ void check_the_message(string& message, int new_fd)
                         }
                         else
                         {
-                            result = do_operation(operation, operands);
+                            string result_str = do_operation(operation, operands);
                             //printf("%f \n", result);
-                            ostringstream strs;
+                            /*ostringstream strs;
                             strs << result;
-                            string result_str = strs.str();
+                            string result_str = strs.str();*/
                             result_string = "ACR " + result_str + "\r";
                             //cout<<result_string.c_str()<<"end"<<endl;
                             //the server has computed the requirement by checking for errors and now it continues with the following process.
@@ -313,7 +313,7 @@ void change_the_port(string& port_number_str)
      if (!fork()) 
        { // this is the child process
        //close(sockfd); // child doesn't need the listener
-       printf("sending result to the client on the new port_number....\n"); 
+       cout<<"sending result:"<<result_string<<" to the client on the new port_number:"<<port_number<<endl; 
        if ((numbytes1 = send(new_fd, result_string.c_str(), result_string.size(), 0)) == -1) 
       perror("server: while sending the result");
       else
