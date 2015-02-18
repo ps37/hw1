@@ -16,7 +16,7 @@
 #include <arpa/inet.h>
 #include <sys/wait.h>
 #include <signal.h>
-//#define PORT "3490" // the port users will be connecting to
+
 #define BACKLOG 20 // how many pending connections queue will hold
 #define MAXBUFLEN 100
 #include "aotp_lib.h"
@@ -24,23 +24,22 @@
 //global variables
 string received_request;
 string message;
-    char operation;
-    vector<double> operands;
-    int port_number = 5000;
-    int numbytes; int numbytes1, numbytes2, numbytes3;
-    char buf1[MAXBUFLEN];
-    int sockfd, new_fd; // listen on sock_fd, new connection on new_fd
- struct addrinfo hints, *servinfo, *p;
- char buf[MAXBUFLEN];
- //struct sockaddr_in *port;
- struct sockaddr_storage their_addr; // connector's address information
- socklen_t sin_size;
- struct sigaction sa;
- int yes=1;
- char s[INET6_ADDRSTRLEN];
- int rv;
- string port_number_str;
- string result_string;
+char operation;
+vector<double> operands;
+int port_number = 5000;
+int numbytes; int numbytes1, numbytes2, numbytes3;
+char buf1[MAXBUFLEN];
+int sockfd, new_fd; // listen on sock_fd, new connection on new_fd
+struct addrinfo hints, *servinfo, *p;
+char buf[MAXBUFLEN];
+struct sockaddr_storage their_addr; // connector's address information
+socklen_t sin_size;
+struct sigaction sa;
+int yes=1;
+char s[INET6_ADDRSTRLEN];
+int rv;
+string port_number_str;
+string result_string;
 
 //error function
     void error(string& s, int socket_int)
@@ -113,10 +112,8 @@ freeaddrinfo(servinfo);
  else
   printf("server: binded the socket succesfully\n");
 
-  // all done with this structure
-
- //printf("server: waiting for connections on port number %d \n", &PORT);
  printf("server: waiting for connections... \n");
+
  while(1) // main accept() loop
   { 
    if (listen(sockfd, BACKLOG) == -1) 
@@ -137,11 +134,10 @@ freeaddrinfo(servinfo);
    inet_ntop(their_addr.ss_family, get_in_addr((struct sockaddr *)&their_addr), 
    s, sizeof s);
 
-   printf("server: got connection from %s\n", s);
+   printf("server: got connection from client at %s\n", s);
 
    if (!fork()) 
      { // this is the child process
-     //close(sockfd); // child doesn't need the listener
 
      //receive the data form client into a buffer
      printf("waiting to receive data from the client side....\n"); 
@@ -152,7 +148,7 @@ freeaddrinfo(servinfo);
        }
 
      //print the adress of the client 
-     printf("server: got packet from %s\n",
+     printf("server: got packet from client at %s\n",
      inet_ntop(their_addr.ss_family,
      get_in_addr((struct sockaddr *)&their_addr),
      s, sizeof s));
@@ -164,15 +160,13 @@ freeaddrinfo(servinfo);
      //reading the message from the client.
     received_request.clear();
     received_request = buf;
-    cout<<"received_request:"<<received_request<<"and its size is:"<<received_request.size()<<endl;
     message.clear();
     message = get_message(received_request);
-    cout<<"message after parsing received_request:"<<message<<endl;
+    cout<<"message after parsing the received request is:"<<message<<endl;
     void error(string&, int);
     void check_the_message(string&, int);
     check_the_message(message, new_fd);
     }//fork
-    //cout<<"the server is now receiving on:"<<port_number-1<<endl;;
   }//while
  close(sockfd);
  return 0;
@@ -206,19 +200,17 @@ void check_the_message(string& message, int new_fd)
                         else
                         {
                             string result_str = do_operation(operation, operands);
-                            //printf("%f \n", result);
-                            /*ostringstream strs;
-                            strs << result;
-                            string result_str = strs.str();*/
+                            //cout<<"the result received from the aotp_lib is:"<<result_str<<endl;
                             result_string = "ACR " + result_str + "\r";
-                            //cout<<result_string.c_str()<<"end"<<endl;
-                            //the server has computed the requirement by checking for errors and now it continues with the following process.
-                            //send change port number notice with port number on the old port(new_fd)
+
                             port_number_str = to_string(port_number); 
                             string change_port_msg = "CPN " + port_number_str + "\r";
 
                             if ((numbytes1 = send(new_fd, change_port_msg.c_str(), change_port_msg.size(), 0)) == -1) 
-                            {perror("server: error while sending the CPN message"); exit(1);}
+                            {perror("server: error while sending the CPN message"); 
+                            exit(1);}
+
+                            cout<<"Server sent CPN message to the client\n";
 
                             //receive the change port acknowledgement on the old port(new_fd)
                             if ((numbytes2 = recv(new_fd, buf1, MAXBUFLEN-1 , 0)) == -1) 
@@ -226,14 +218,12 @@ void check_the_message(string& message, int new_fd)
                              printf("error while receiving the CPN_ack");
                              exit(1);
                              }
-
-                             //}
+                            buf1[numbytes2] = '\0';
                              string buffer = buf1;
                              message = get_message(buffer);
-                              cout<<"client sent the ack:"<<message<<endl; //CPN message
                               if(message == "CPN_ACK")
                               {
-                                cout<<"client sent the:"<<message<<endl;
+                                cout<<"client sent the acknowledgement for 'CPN' message:"<<message<<endl;
                                 change_the_port(port_number_str);
                               }
                               else if(message != "CPN_ACK")
@@ -250,8 +240,9 @@ void check_the_message(string& message, int new_fd)
 
 void change_the_port(string& port_number_str)
 {
-  //change of port number to notified port number??
+      //change of port number to notified port number??
       //1.create structs using get_addrinfo() system call??
+      cout<<"server: changing to the port number "<<port_number_str<<endl;
       if ((rv = getaddrinfo(NULL, port_number_str.c_str(), &hints, &servinfo)) != 0) 
       {
       fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
@@ -286,8 +277,6 @@ void change_the_port(string& port_number_str)
        //return 2;
        }
        else
-       printf("server: binded the new socket succesfully\n");
-
        cout<<"the server is now binded to the port on:"<<port_number<<endl; 
 
        if (listen(sockfd, BACKLOG) == -1) 
@@ -308,12 +297,13 @@ void change_the_port(string& port_number_str)
        inet_ntop(their_addr.ss_family, get_in_addr((struct sockaddr *)&their_addr), 
        s, sizeof s);
 
-     printf("server: got connection from %s\n", s);
+     printf("server: got connection from client:%s ", s);
+     cout<<"on the new port number:"<<port_number_str<<endl;
 ////////////////////////////
      if (!fork()) 
        { // this is the child process
        //close(sockfd); // child doesn't need the listener
-       cout<<"sending result:"<<result_string<<" to the client on the new port_number:"<<port_number<<endl; 
+ 
        if ((numbytes1 = send(new_fd, result_string.c_str(), result_string.size(), 0)) == -1) 
       perror("server: while sending the result");
       else

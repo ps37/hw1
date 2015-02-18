@@ -89,8 +89,13 @@ int main(int argc, char *argv[])
  string operation;
  string operands_list;
  string request = "AOSR";
- 
- cout<<"please enter the operation you want\n";
+
+ cout<<"please enter the operation you want to perform:\n";
+ cout<<"Please enter the phrases in double quotes for choosing corresponding operations:"; 
+ cout<<"\"add\" for addition \n";
+ cout<<"\"subtract\" for subtraction \n";
+ cout<<"\"devide\" for devision \n";
+ cout<<"\"multiply\" for multiplication operation. \n\n";
  cin>>operation;
  if(operation == "add")
  request += " +";
@@ -102,8 +107,8 @@ int main(int argc, char *argv[])
  request += " *";
  else
  request += " ~";
- 
- cout<<"please enter the operands and press cntrl+d/EOF when done\n";
+
+ cout<<"please enter the operands and press \"EOF character\" when you are done entering the operands\n";
  while(cin)
  {
      cin>>operand;
@@ -118,7 +123,7 @@ int main(int argc, char *argv[])
 
  operands_list += "\r";
  request += operands_list;
- cout<<request<<endl; 
+ cout<<"client is sending the request as:"<<request<<endl; 
   
  //sending the operation request message to the server
   if ((numbytes = send(sockfd, request.c_str(), request.size(), 0)) == -1) {
@@ -133,15 +138,17 @@ int main(int argc, char *argv[])
  exit(1);
  }
  //analyze the message by parsing it
+ buf[numbytes1] = '\0';
  string buffer = buf;
- printf("%s\n", buf);
- cout<<buf<<":"<<buffer<<endl;
+ //printf("%s\n", buf);
+ cout<<"Client received the following message from server:"<<buffer<<endl;
  void parse_the_message(string&);
 
  parse_the_message(buffer);
 
  if(message == "CPN") //check if the msg is CPN or Error or Result. message = CPN and data = port.
     {
+        cout<<"Client received the port number:"<<data<<" in the change Port notice CPN message"<<endl;
         message.clear();    //clear the message for using it again.
         string one = "1";
         string CPN_ack = "CPN_ACK " + one + "\r";  
@@ -151,10 +158,9 @@ int main(int argc, char *argv[])
          perror("client: send");
          exit(1);
         }
-         printf("client: sent CPN_ACK of %d bytes to %s\n", numbytes, argv[2]);
+         cout<<"client: sent CPN acknowledgement message to the server as"<<CPN_ack<<endl;
 
-         cout<<data<<endl;  //is the client getting the new portnumber??
-
+         cout<<"client is getting connected to the new port number:"<<data<<"....\n";
          //probably add some delay.
          for (double i = 0; i < 20000; i = i + 0.5)
           {
@@ -190,7 +196,7 @@ int main(int argc, char *argv[])
          return 2;
          }
          else
-            fprintf(stderr, "client: connection is successful\n");
+            fprintf(stderr, "client: connection is successful to the new port number\n");
 
         //receive the 2nd message from server using new socket descriptor
          if ((numbytes1 = recv(sockfd_new, buf, MAXDATASIZE-1, 0)) == -1) 
@@ -198,22 +204,23 @@ int main(int argc, char *argv[])
          perror("recv");
          exit(1);
          }
+         buf[numbytes1] = '\0';
          buffer = buf;
-         cout<<"this is after changing the port\n";
-         printf("%s\n", buf);
-         cout<<buf<<":"<<buffer<<endl;
+         cout<<"The message received on the new port is\n";
+         //printf("%s\n", buf);
+         cout<<buffer<<endl;
          parse_the_message(buffer);
          if (message == "ACR")
             {
                 message.clear();
-                cout<<"Result:"<<data<<endl;
+                cout<<"**** RESULT:"<<data<<" ****"<<endl;
                 data.clear();
             }
 
         else if (message == "ERROR")
             {
                 message.clear();
-                cout<<"Error:"<<data<<endl;
+                cout<<"**** ERROR:"<<data<<" ****"<<endl;
                 data.clear();
             }
 
@@ -222,14 +229,14 @@ int main(int argc, char *argv[])
 else if (message == "ACR")
     {
         message.clear();
-        cout<<"Result:"<<data<<endl;
+        cout<<"**** RESULT:"<<data<<" ****"<<endl;
         data.clear();
     }
 
 else if (message == "ERROR")
     {
         message.clear();
-        cout<<"Error:"<<data<<endl;
+        cout<<"**** ERROR:"<<data<<" ****"<<endl;
         data.clear();
     }
 
@@ -246,7 +253,7 @@ return 0;
         message += buffer[rcvd_msg_index];
         rcvd_msg_index++;
     }
-    cout<<message<<endl; //CPN message
+    //cout<<message<<endl; //CPN message
 
     rcvd_msg_index = rcvd_msg_index+1;
 
@@ -255,5 +262,5 @@ return 0;
      data += buffer[rcvd_msg_index];
         rcvd_msg_index++; 
     }
-    cout<<data<<endl; //port number
+    //cout<<data<<endl; //port number
  }

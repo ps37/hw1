@@ -154,6 +154,7 @@ string do_operation(char& c, vector<double>& operands)
             {
                 result = result + operands[k];
             }
+            cout<<"the 'result' in aotp_lib is:"<<result<<endl;
             strs << result;
             result_str = strs.str();
             break;
@@ -207,6 +208,6 @@ string do_operation(char& c, vector<double>& operands)
             result_str = "not a valid operation!";
             break;
     }
-    cout<<"the result IN aotp_lib is:"<<result_str<<endl;
+    //cout<<"the result IN aotp_lib is:"<<result_str<<endl;
     return result_str;
 }
