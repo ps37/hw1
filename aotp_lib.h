@@ -167,7 +167,8 @@ string do_operation(char& c, vector<double>& operands)
             result = operands[0];
             for (int k = 1; k<=operands.size(); k++)
             {
-                if (operands[k]==0)
+                cout<<operands[k]<<endl;
+                if (k < operands.size() && operands[k]==0)
                 {
                     result_str = "division is not possible";
                     break;
