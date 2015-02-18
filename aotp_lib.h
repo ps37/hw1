@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 #include <err.h>
 #include <errno.h>
 #include <stdlib.h>
@@ -11,7 +12,6 @@ int index_of_request = 0; //iterator of the initial message sent by the client
 
 string get_message(string& b)
 {
-    cout<<"the received string in aotp_lib.get_message is:"<<b<<endl;
     int i = 0;
     string msg; msg.clear();
     while(b[i]!=' ')   //loop for collecting the message from request
@@ -19,7 +19,7 @@ string get_message(string& b)
         msg += b[i];
         i++;
     }
-    cout<<msg<<endl;
+    //cout<<msg<<endl;
     index_of_request = i;
     index_of_request = index_of_request+1;
     return msg;
@@ -27,7 +27,7 @@ string get_message(string& b)
 
 vector<double> get_operands(string& a)
 {
-    cout<<"the received request in the get_operands is:"<<a<<"and its size is:"<<a.size()<<endl;
+    //cout<<"the received request in the get_operands is:"<<a<<"and its size is:"<<a.size()<<endl;
     int j = 0;
     vector<double> operands;
     string operand;
@@ -39,14 +39,14 @@ vector<double> get_operands(string& a)
         
         if (a[index_of_request] != ' ' && a[index_of_request] != '\r' && a[index_of_request] != '\n')
         {
-            cout<<"i'm collecting an operand\n";
+            //cout<<"i'm collecting an operand\n";
             operand = operand + a[index_of_request];
-            cout<<operand<<endl;
+            //cout<<operand<<endl;
         }
         
         else if(a[index_of_request] == ' ' || a[index_of_request] == '\r' || a[index_of_request] == '\n')
         {
-            cout<<"i am in else-if\n";
+            //cout<<"i am in else-if\n";
             double number;
             
             if (operand == "0")
@@ -62,22 +62,27 @@ vector<double> get_operands(string& a)
                 number = atof(operand.c_str());
                 if (number == 0)
                 {
-                    cout<<"i am taking in-valid operand\n";
+                    //cout<<"i am taking in-valid operand\n";
                     operands.push_back(10.0103);
-                    cout<<operands[j]<<endl;
+                    //cout<<operands[j]<<endl;
                     operand.clear();
                 }
                 else
                 {
-                    cout<<"i am taking valid operand\n";
+                    //cout<<"i am taking valid operand\n";
                     operands.push_back(number);
-                    cout<<operands[j]<<endl;
+                    //cout<<operands[j]<<endl;
                     operand.clear();
                 }
             }
             j++;
         }
         index_of_request++;
+    }
+    cout<<"the operands sent by the client are:\n";
+    for (int i = 0; i < operands.size(); ++i)
+    {
+        cout<<operands[i]<<endl;
     }
     return operands;
 }
@@ -88,7 +93,7 @@ char get_operation(string& c)
     char operation;
     operation = c[index_of_request];  //statement for collecting the operation
     index_of_request = index_of_request+2;
-    cout<<operation<<endl;
+    cout<<"the operation requested is:"<<operation<<endl;
     return operation;
 }
 
@@ -202,5 +207,6 @@ string do_operation(char& c, vector<double>& operands)
             result_str = "not a valid operation!";
             break;
     }
+    cout<<"the result IN aotp_lib is:"<<result_str<<endl;
     return result_str;
 }
