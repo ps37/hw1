@@ -1,3 +1,2 @@
 # hw1
-line 1
-line 2
+Among the commits, The commits with the message "Add The final versions for HW1!" are the actual final submission for HW1!
