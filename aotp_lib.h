@@ -154,7 +154,6 @@ string do_operation(char& c, vector<double>& operands)
             {
                 result = result + operands[k];
             }
-            cout<<"the 'result' in aotp_lib is:"<<result<<endl;
             strs << result;
             result_str = strs.str();
             break;
@@ -173,7 +172,7 @@ string do_operation(char& c, vector<double>& operands)
             result = operands[0];
             for (int k = 1; k<=operands.size(); k++)
             {
-                cout<<operands[k]<<endl;
+                //cout<<operands[k]<<endl;
                 if (k < operands.size() && operands[k]==0)
                 {
                     result_str = "division is not possible";
@@ -209,5 +208,6 @@ string do_operation(char& c, vector<double>& operands)
             break;
     }
     //cout<<"the result IN aotp_lib is:"<<result_str<<endl;
+    cout<<"the 'result' computed is:"<<result_str<<endl;
     return result_str;
 }
