@@ -167,7 +167,7 @@ int main(int argc, char *argv[])
           } 
 
          //now create new socket for revceiving on the the new port
-         if ((rv = getaddrinfo(argv[2], data.c_str(), &hints, &servinfo)) != 0) 
+         if ((rv = getaddrinfo(argv[4], data.c_str(), &hints, &servinfo)) != 0) 
          {
          fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
          return 1;
