@@ -26,7 +26,7 @@ string received_request;
 string message;
 char operation;
 vector<double> operands;
-int port_number = 5000;
+int port_number = 5004;
 int numbytes; int numbytes1, numbytes2, numbytes3;
 char buf1[MAXBUFLEN];
 int sockfd, new_fd; // listen on sock_fd, new connection on new_fd
@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
  hints.ai_flags = AI_PASSIVE; // use my IP
 
  if (argc != 3) {
- fprintf(stderr,"usage: client hostname\n");
+ fprintf(stderr,"usage: server hostname\n");
  exit(1);
  }
 
@@ -134,13 +134,13 @@ freeaddrinfo(servinfo);
    inet_ntop(their_addr.ss_family, get_in_addr((struct sockaddr *)&their_addr), 
    s, sizeof s);
 
-   printf("server: got connection from client at %s\n", s);
+   printf("server: client at %s is now connected\n", s);
 
    if (!fork()) 
      { // this is the child process
 
      //receive the data form client into a buffer
-     printf("waiting to receive data from the client side....\n"); 
+     //printf("Server: waiting to receive data from the client side....\n"); 
      if ((numbytes = recv(new_fd, buf, MAXBUFLEN-1 , 0)) == -1) 
        {
        perror("recv");
@@ -148,21 +148,21 @@ freeaddrinfo(servinfo);
        }
 
      //print the adress of the client 
-     printf("server: got packet from client at %s\n",
+     printf("server: Received packet from client at %s\n",
      inet_ntop(their_addr.ss_family,
      get_in_addr((struct sockaddr *)&their_addr),
      s, sizeof s));
      //print the number of bytes received and print the bytes.
      printf("server: packet is %d bytes long\n", numbytes);
      buf[numbytes] = '\0';
-     printf("server: packet contains '%s' \n", buf);
+     printf("server: packet contains %s \n", buf);
      
      //reading the message from the client.
     received_request.clear();
     received_request = buf;
     message.clear();
     message = get_message(received_request);
-    cout<<"message after parsing the received request is:"<<message<<endl;
+    //cout<<"Message after parsing the received request is:"<<message<<endl;
     void error(string&, int);
     void check_the_message(string&, int);
     check_the_message(message, new_fd);
@@ -207,10 +207,10 @@ void check_the_message(string& message, int new_fd)
                             string change_port_msg = "CPN " + port_number_str + "\r";
 
                             if ((numbytes1 = send(new_fd, change_port_msg.c_str(), change_port_msg.size(), 0)) == -1) 
-                            {perror("server: error while sending the CPN message"); 
+                            {perror("Server: error while sending the CPN message"); 
                             exit(1);}
 
-                            cout<<"Server sent CPN message to the client\n";
+                            cout<<"Server: Sent CPN message to the client\n";
 
                             //receive the change port acknowledgement on the old port(new_fd)
                             if ((numbytes2 = recv(new_fd, buf1, MAXBUFLEN-1 , 0)) == -1) 
@@ -223,12 +223,12 @@ void check_the_message(string& message, int new_fd)
                              message = get_message(buffer);
                               if(message == "CPN_ACK")
                               {
-                                cout<<"client sent the acknowledgement for 'CPN' message:"<<message<<endl;
+                                cout<<"Sever: Received the acknowledgement for 'CPN' message:"<<message<<endl;
                                 change_the_port(port_number_str);
                               }
                               else if(message != "CPN_ACK")
                               {
-                                string s = "no acknowledgement for CPN";
+                                string s = "Server: Received NO acknowledgement for CPN";
                                 error(s, new_fd);
                               }
                               close(new_fd);
@@ -242,7 +242,7 @@ void change_the_port(string& port_number_str)
 {
       //change of port number to notified port number??
       //1.create structs using get_addrinfo() system call??
-      cout<<"server: changing to the port number "<<port_number_str<<endl;
+      cout<<"Server: changing to the new port number "<<port_number_str<<endl;
       if ((rv = getaddrinfo(NULL, port_number_str.c_str(), &hints, &servinfo)) != 0) 
       {
       fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
@@ -277,7 +277,7 @@ void change_the_port(string& port_number_str)
        //return 2;
        }
        else
-       cout<<"the server is now binded to the port on:"<<port_number<<endl; 
+       cout<<"Server: succesfully binded to the port on:"<<port_number<<endl; 
 
        if (listen(sockfd, BACKLOG) == -1) 
        {
@@ -297,7 +297,7 @@ void change_the_port(string& port_number_str)
        inet_ntop(their_addr.ss_family, get_in_addr((struct sockaddr *)&their_addr), 
        s, sizeof s);
 
-     printf("server: got connection from client:%s ", s);
+     printf("server: client at %s is now connected", s);
      cout<<"on the new port number:"<<port_number_str<<endl;
 ////////////////////////////
      if (!fork()) 
@@ -305,13 +305,13 @@ void change_the_port(string& port_number_str)
        //close(sockfd); // child doesn't need the listener
  
        if ((numbytes1 = send(new_fd, result_string.c_str(), result_string.size(), 0)) == -1) 
-      perror("server: while sending the result");
+      perror("server: Error while sending the result");
       else
-      printf("The result is  sent to the client at %s \n\n",  inet_ntop(their_addr.ss_family,
+      printf("Server: sent result to the client at %s\n\n",  inet_ntop(their_addr.ss_family,
       get_in_addr((struct sockaddr *)&their_addr),
       s, sizeof s) );
       }
-      cout<<"the server is now listening on port number:"<<port_number<<endl;
+      cout<<"Server: The server is now listening on port number:"<<port_number<<endl;
     }
       //return 1;
 }

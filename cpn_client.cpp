@@ -18,7 +18,6 @@ using namespace std;
 //global variables
 string message;
 string data;
-//#define PORT "3490" // the port client will be connecting to
 #define MAXDATASIZE 100 // max number of bytes we can get at once
 
 void *get_in_addr(struct sockaddr *sa)
@@ -46,7 +45,7 @@ int main(int argc, char *argv[])
  hints.ai_family = AF_UNSPEC;
  hints.ai_socktype = SOCK_STREAM;
 
- if ((rv = getaddrinfo(argv[2], argv[4], &hints, &servinfo)) != 0) {
+ if ((rv = getaddrinfo(argv[4], argv[2], &hints, &servinfo)) != 0) {
  fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(rv));
  return 1;
  }
@@ -70,7 +69,7 @@ int main(int argc, char *argv[])
  inet_ntop(p->ai_family, get_in_addr((struct sockaddr *)p->ai_addr),
  s, sizeof s);
 
- printf("client: connecting to %s\n", argv[2]);
+ printf("client: connecting to the server at host %s and port %s\n", argv[4], argv[2]);
 
  freeaddrinfo(servinfo); // all done with this structure
 
@@ -123,14 +122,14 @@ int main(int argc, char *argv[])
 
  operands_list += "\r";
  request += operands_list;
- cout<<"client is sending the request as:"<<request<<endl; 
+ cout<<"client: sent the request as:"<<request<<endl; 
   
  //sending the operation request message to the server
   if ((numbytes = send(sockfd, request.c_str(), request.size(), 0)) == -1) {
  perror("client: send");
  exit(1);
  }
- printf("client: sent %d bytes to %s\n", numbytes, argv[2]);
+ printf("client: sent %d bytes to server at %s\n", numbytes, argv[4]);
  
  //receive the message from the server
  if ((numbytes1 = recv(sockfd, buf, MAXDATASIZE-1, 0)) == -1) {
@@ -141,14 +140,14 @@ int main(int argc, char *argv[])
  buf[numbytes1] = '\0';
  string buffer = buf;
  //printf("%s\n", buf);
- cout<<"Client received the following message from server:"<<buffer<<endl;
+ cout<<"Client: Received the following message from server:"<<buffer<<endl;
  void parse_the_message(string&);
 
  parse_the_message(buffer);
 
  if(message == "CPN") //check if the msg is CPN or Error or Result. message = CPN and data = port.
     {
-        cout<<"Client received the port number:"<<data<<" in the change Port notice CPN message"<<endl;
+        cout<<"Client: received the port number:"<<data<<" in the change Port notice CPN message"<<endl;
         message.clear();    //clear the message for using it again.
         string one = "1";
         string CPN_ack = "CPN_ACK " + one + "\r";  
@@ -160,9 +159,9 @@ int main(int argc, char *argv[])
         }
          cout<<"client: sent CPN acknowledgement message to the server as"<<CPN_ack<<endl;
 
-         cout<<"client is getting connected to the new port number:"<<data<<"....\n";
+         cout<<"client: is getting connected to the new port number:"<<data<<"....\n";
          //probably add some delay.
-         for (double i = 0; i < 20000; i = i + 0.5)
+         for (double i = 0; i < 200000; i = i + 0.5)
           {
 
           } 
@@ -206,7 +205,7 @@ int main(int argc, char *argv[])
          }
          buf[numbytes1] = '\0';
          buffer = buf;
-         cout<<"The message received on the new port is\n";
+         cout<<"Client: received message on the new port is\n";
          //printf("%s\n", buf);
          cout<<buffer<<endl;
          parse_the_message(buffer);
