@@ -1,4 +1,6 @@
 # hw1
+Among the commits, The commits withe the message "Add The final versions for HW1!" are the actual final submission for HW1.
+
 Author: Prudhvi Chandra Simhadri
 Contact Information: pcsimhadri@uh.edu
 
