@@ -202,8 +202,9 @@ void check_the_message(string& message, int new_fd)
                             string result_str = do_operation(operation, operands);
                             //cout<<"the result received from the aotp_lib is:"<<result_str<<endl;
                             result_string = "ACR " + result_str + "\r";
-
-                            port_number_str = to_string(port_number); 
+                            ostringstream strs;
+            		            strs << port_number;
+                            port_number_str = strs.str(); 
                             string change_port_msg = "CPN " + port_number_str + "\r";
 
                             if ((numbytes1 = send(new_fd, change_port_msg.c_str(), change_port_msg.size(), 0)) == -1) 

@@ -211,3 +211,4 @@ string do_operation(char& c, vector<double>& operands)
     cout<<"the 'result' computed is:"<<result_str<<endl;
     return result_str;
 }
+	
