@@ -197,8 +197,7 @@ int main(int argc, char *argv[])
          fprintf(stderr, "client: failed to connect\n");
          return 2;
          }
-         else
-            fprintf(stderr, "client: connection is successful to the new port number\n");
+         //else
 
         //receive the 2nd message from server using new socket descriptor
          if ((numbytes1 = recv(sockfd_new, buf, MAXDATASIZE-1, 0)) == -1) 
@@ -206,6 +205,9 @@ int main(int argc, char *argv[])
          perror("recv");
          exit(1);
          }
+         else
+            fprintf(stderr, "client: connection is successful to the new port number\n");
+
          buf[numbytes1] = '\0';
          buffer = buf;
          cout<<"Client: received message on the new port is:";
@@ -215,11 +217,13 @@ int main(int argc, char *argv[])
          if (message == "ACR")
             {
                 cout<<"**** RESULT:"<<data<<" ****"<<endl;
+                printf("\nClient: The server is now listening on the new port number %s", port_number.c_str());
             }
 
         else if (message == "ERROR")
             {
                 cout<<"**** ERROR:"<<data<<" ****"<<endl;
+                printf("The server is still listening on the old port number\n");
             }
 
     }
@@ -227,14 +231,15 @@ int main(int argc, char *argv[])
 else if (message == "ACR")
     {
         cout<<"**** RESULT:"<<data<<" ****"<<endl;
+        printf("\nClient: The server is now listening on the new port number %s", port_number.c_str());
     }
 
 else if (message == "ERROR")
     {
         cout<<"**** ERROR:"<<data<<" ****"<<endl;
+        printf("The server is still listening on the old port number\n");
     }
 
-printf("\nClient: The server is now listening on the new port number %s", port_number.c_str());
 cout<<"\n"<<endl;
 port_number.clear(); //clear the data for using it again
 data.clear();

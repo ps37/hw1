@@ -50,7 +50,7 @@ string result_string;
            {
                perror("Server Error: Send in the error function");
            }
-        cout<<"the server is still listening on:"<<port_number_str<<endl;
+        cout<<"The server is now listening on the old port "<<port_number_str<<endl;
     }
      
 // get sockaddr, IPv4 or IPv6:
