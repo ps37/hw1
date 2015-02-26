@@ -244,8 +244,8 @@ else if (message == "ERROR")
 else
     cout<<"I am in else"<<endl;
 
-<<<<<<< HEAD
-printf("\nClient: The server is now listening on the new port number %s", port_number.c_str());
+//<<<<<<< HEAD
+//printf("\nClient: The server is now listening on the new port number %s", port_number.c_str());
 cout<<"\n"<<endl;
 port_number.clear(); //clear the data for using it again
 data.clear();
