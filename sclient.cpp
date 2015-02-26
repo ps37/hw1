@@ -245,11 +245,7 @@ else
     cout<<"I am in else"<<endl;
 
 <<<<<<< HEAD
-||||||| merged common ancestors
 printf("\nClient: The server is now listening on the new port number %s", port_number.c_str());
-=======
-//printf("\nClient: The server is now listening on the new port number %s", port_number.c_str());
->>>>>>> master
 cout<<"\n"<<endl;
 port_number.clear(); //clear the data for using it again
 data.clear();
