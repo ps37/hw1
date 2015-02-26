@@ -51,6 +51,7 @@ int main(int argc, char *argv[])
  return 1;
  }
 
+printf("client: connecting to the server at host %s and port %s\n", argv[4], argv[2]);
  // loop through all the results and connect to the first we can
  for(p = servinfo; p != NULL; p = p->ai_next) 
  {
@@ -59,18 +60,19 @@ int main(int argc, char *argv[])
  perror("client: socket");
  continue;
  }
- if (connect(sockfd, p->ai_addr, p->ai_addrlen) == -1) {
+ if (connect(sockfd, p->ai_addr, p->ai_addrlen) == -1) 
+ {
  close(sockfd);
  perror("client: connect");
  continue;
  }
+ else
+    printf("client: connection is successful\n");
  break;
  }
 
  inet_ntop(p->ai_family, get_in_addr((struct sockaddr *)p->ai_addr),
  s, sizeof s);
-
- printf("client: connecting to the server at host %s and port %s\n", argv[4], argv[2]);
 
  freeaddrinfo(servinfo); // all done with this structure
 
@@ -79,9 +81,6 @@ int main(int argc, char *argv[])
  fprintf(stderr, "client: failed to connect\n");
  return 2;
  }
- else
-    fprintf(stderr, "client: connection is successful\n");
-    //return 2;
  
  //take the input from the user
  vector<string> operands;
@@ -121,7 +120,7 @@ int main(int argc, char *argv[])
         operands_list += operands[i];
     }
 
- operands_list += "\r";
+ operands_list += "\n";
  request += operands_list; 
   
  //sending the operation request message to the server
@@ -133,6 +132,7 @@ int main(int argc, char *argv[])
  //printf("client: sent %d bytes to server at %s\n", numbytes, argv[4]);
  
  //receive the message from the server
+ string buf1;
  if ((numbytes1 = recv(sockfd, buf, MAXDATASIZE-1, 0)) == -1) {
  perror("recv");
  exit(1);
@@ -140,10 +140,12 @@ int main(int argc, char *argv[])
  //analyze the message by parsing it
  buf[numbytes1] = '\0';
  string buffer = buf;
- //printf("%s\n", buf);
+ printf("%s\n", buf);
+ cout<<"Client: The number of received bytes is: "<<numbytes1<<endl;
  cout<<"Client: Received the following message from server:"<<buffer<<endl;
  void parse_the_message(string&);
-
+message.clear();
+data.clear();
  parse_the_message(buffer);
 
  if(message == "CPN") //check if the msg is CPN or Error or Result. message = CPN and data = port.
@@ -233,8 +235,10 @@ else if (message == "ERROR")
     {
         cout<<"**** ERROR:"<<data<<" ****"<<endl;
     }
+else
+    cout<<"I am in else"<<endl;
 
-printf("\nClient: The server is now listening on the new port number %s", port_number.c_str());
+//printf("\nClient: The server is now listening on the new port number %s", port_number.c_str());
 cout<<"\n"<<endl;
 port_number.clear(); //clear the data for using it again
 data.clear();
@@ -252,7 +256,7 @@ return 0;
         message += buffer[rcvd_msg_index];
         rcvd_msg_index++;
     }
-    //cout<<message<<endl; //CPN message
+    cout<<"message is: "<<message<<endl; //CPN message
 
     rcvd_msg_index = rcvd_msg_index+1;
 
@@ -261,6 +265,6 @@ return 0;
      data += buffer[rcvd_msg_index];
         rcvd_msg_index++; 
     }
-    //cout<<data<<endl; //port number
+    cout<<"data is: "<<data<<endl; //port number
  }
 
